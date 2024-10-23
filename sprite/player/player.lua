@@ -5,15 +5,13 @@ player.shoot_laser_timer = 0.0
 
 player.linear_velocity = 380
 
-player.bullet_sprite = love.graphics.newImage('resource/image/laser1.png')
-player.sprite_sheet = love.graphics.newImage('resource/image/player_sprite.png')
-player.grid = anim8.newGrid(64, 64, player.sprite_sheet:getWidth(), player.sprite_sheet:getHeight())
+player.grid = anim8.newGrid(64, 64, sprites.player:getWidth(), sprites.player:getHeight())
 
 player.direction = create_vector()
 player.position = create_vector()
 
-player.position.x = virtualWidth / 2 - player.grid.frameWidth / 2
-player.position.y = virtualHeight - player.grid.frameHeight
+player.position.x = virtual_width / 2 - player.grid.frameWidth / 2
+player.position.y = virtual_height - player.grid.frameHeight
 
 player.animation = {}
 
@@ -66,7 +64,7 @@ function player:update(dt)
 end
 
 function player:draw()
-    self.current_anim:draw(self.sprite_sheet, self.position.x, self.position.y)
+    self.current_anim:draw(sprites.player, self.position.x, self.position.y)
     for i = 1, #self.bullets do
         self.bullets[i]:draw()
     end
@@ -76,8 +74,8 @@ function player:fire_bullet()
     local bullet = copy_table(bullet, true)
     bullet.direction.y = -1
     bullet.linear_velocity = 900
-    bullet.position.x = self.position.x + self.grid.frameWidth / 2 - self.bullet_sprite:getWidth() / 2
-    bullet.position.y = self.position.y - self.bullet_sprite:getHeight()
+    bullet.position.x = self.position.x + self.grid.frameWidth / 2 - sprites.bullet:getWidth() / 2
+    bullet.position.y = self.position.y - sprites.bullet:getHeight()
     math.randomseed(os.time())
     bullet.drift_direciton = math.random(-1, 1)
     table.insert(self.bullets, bullet)

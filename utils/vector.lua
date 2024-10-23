@@ -33,7 +33,8 @@ vector_meta = {
 
 vector = {
     x = 0.0,
-    y = 0.0
+    y = 0.0,
+    is_vector = true
 }
 
 function vector:is_zero_vec()
@@ -47,5 +48,5 @@ function normalize_vec(vec)
 end
 
 function create_vector()
-    return setmetatable(copy_table(vector, true), vector_meta)
+    return setmetatable(copy_table(vector, vector.is_vector), vector_meta)
 end

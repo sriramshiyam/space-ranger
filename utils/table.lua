@@ -4,7 +4,7 @@ function copy_table(t, is_vector)
         setmetatable(t2, vector_meta)
     end
     for k, v in pairs(t) do
-        t2[k] = type(v) == "table" and copy_table(v, is_vector) or v
+        t2[k] = type(v) == "table" and copy_table(v, v.is_vector) or v
     end
     return t2
 end

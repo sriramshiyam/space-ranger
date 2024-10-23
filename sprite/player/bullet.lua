@@ -16,13 +16,12 @@ function bullet:update(dt)
         self.position.x = self.position.x + self.drift_direciton * 8.5
     end
 
-    if self.position.y + player.bullet_sprite:getHeight() < 0 then
-        return true
-    end
-
-    return false
+    return (self.position.y + sprites.bullet:getHeight() < 0 or
+        self.position.x + sprites.bullet:getWidth() < 0 or
+        self.position.y > virtual_height or
+        self.position.x > virtual_width)
 end
 
-function bullet:draw()
-    love.graphics.draw(player.bullet_sprite, self.position.x, self.position.y)
+function bullet:draw(sprite)
+    love.graphics.draw(sprites.bullet, self.position.x, self.position.y)
 end

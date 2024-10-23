@@ -1,39 +1,42 @@
-virtualHeight = 1000
-virtualWidth = 1000
+virtual_height = 1000
+virtual_width = 1000
 
 local canvas
 
 canvasOffsetX = 0
 canvasOffsetY = 0
 
-function draw_canvas()
-    local windowWidth, windowHeight = love.graphics.getDimensions()
-
-    local scale = math.min(windowWidth / virtualWidth, windowHeight / virtualHeight)
-
-    canvasOffsetX = (windowWidth - virtualWidth * scale) / 2
-    canvasOffsetY = (windowHeight - virtualHeight * scale) / 2
-
-    love.graphics.draw(canvas, canvasOffsetX, canvasOffsetY, 0, scale, scale)
-end
-
-anim8 = require "lib.anim8"
+anim8 = require("lib.anim8")
 require("utils.table")
 require("utils.vector")
 require("utils.sound")
-require("sprite.bullet")
-require("sprite.player")
+require("sprite.sprites")
+require("sprite.player.bullet")
+require("sprite.player.player")
+require("sprite.enemy.enemy")
+
+function draw_canvas()
+    local windowWidth, windowHeight = love.graphics.getDimensions()
+
+    local scale = math.min(windowWidth / virtual_width, windowHeight / virtual_height)
+
+    canvasOffsetX = (windowWidth - virtual_width * scale) / 2
+    canvasOffsetY = (windowHeight - virtual_height * scale) / 2
+
+    love.graphics.draw(canvas, canvasOffsetX, canvasOffsetY, 0, scale, scale)
+end
 
 function love.load()
     love.window.setTitle("Space Shooter")
     love.window.setMode(800, 600, { resizable = true, vsync = 0, minwidth = 400, minheight = 3 })
     love.window.maximize()
 
-    canvas = love.graphics.newCanvas(virtualWidth, virtualHeight)
+    canvas = love.graphics.newCanvas(virtual_width, virtual_height)
 end
 
 function love.update(dt)
     player:update(dt)
+    enemy:update(dt)
     -- require("debug_lib.lovebird").update()
 end
 
@@ -42,6 +45,7 @@ function love.draw()
     love.graphics.setCanvas(canvas)
     love.graphics.clear(0, 0, 0, 1)
     player:draw()
+    enemy:draw()
     love.graphics.setCanvas()
     draw_canvas()
 end
