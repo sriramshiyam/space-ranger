@@ -1,7 +1,7 @@
 enemy = {}
 
 enemy.bullets = {}
-enemy.shoot_laser_timer = 0.0
+enemy.shoot_laser_timer = 2.0
 
 enemy.linear_velocity = 380
 enemy.rotational_velocity = 35
@@ -18,16 +18,20 @@ enemy.position.y = virtual_height / 2
 enemy.rotation_offset = -90.0
 enemy.rotation = enemy.rotation_offset
 enemy.scale = 0.0
-enemy.delay = 0.200
+enemy.delay = 0.0
 enemy.is_removed = false
 enemy.despawn = false
-
 enemy.scale_timer = 0.0
+
+enemy.shake_direction = create_vector()
+enemy.shake_scale = 1
 
 function enemy:update(dt)
     if self.is_removed then
         return
     end
+
+    self.shoot_laser_timer = self.shoot_laser_timer - dt
 
     if self.delay > 0.0 then
         self.delay = self.delay - dt
@@ -44,8 +48,16 @@ function enemy:update(dt)
     local y_length = (virtual_height / 2 - y_offset) / 2
     local y_origin = y_offset + y_length + (y_length * self.rotation_lap_no * 2)
 
-    self.position.x = x_origin + math.cos(math.rad(self.rotation)) * x_length
-    self.position.y = y_origin + -math.sin(math.rad(self.rotation)) * y_length
+    local cosine = math.cos(math.rad(self.rotation))
+    local sine = -math.sin(math.rad(self.rotation))
+
+    self.position.x = x_origin + cosine * x_length
+    self.position.y = y_origin + sine * y_length
+
+    self.shake_direction = rotate_vector({ x = cosine, y = sine }, 180)
+
+    self.position = self.position + self.shake_direction * self.shake_scale * 1.2
+    self.shake_scale = self.shake_scale * -1
 
     if self.rotation_lap_no == 0 and self.rotation >= (360.0 + self.rotation_offset) then
         self.rotation_lap_no = self.rotation_lap_no + 1
@@ -61,6 +73,12 @@ function enemy:update(dt)
         self.scale = 1 * self.scale_timer / 1.0
         self.scale_timer = self.scale_timer + dt
     end
+
+    if self.shoot_laser_timer <= 0.0 then
+        self:fire_bullet()
+        sounds.enemy_laser:play()
+        self.shoot_laser_timer = 2.0
+    end
 end
 
 function enemy:draw()
@@ -68,4 +86,17 @@ function enemy:draw()
         math.rad((self.rotation_lap_no == 0 and 0 or -180) + -self.rotation), self.scale, nil,
         self.origin.x,
         self.origin.y)
+end
+
+function enemy:fire_bullet()
+    local bullet = copy_table(enemy_bullet, true)
+    bullet.direction = player.position - self.position
+
+    normalize_vector(bullet.direction)
+
+    bullet.linear_velocity = self.linear_velocity - 225
+    bullet.position = self.position
+    bullet.shake_direction = rotate_vector(bullet.direction, 90)
+
+    table.insert(enemy_bullets, bullet)
 end
