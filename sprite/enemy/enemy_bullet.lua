@@ -11,16 +11,16 @@ function enemy_bullet:update(dt)
     self.position = self.position +
         (self.direction * self.linear_velocity * dt)
 
-    self.position = self.position + self.shake_direction * self.shake_scale * 2.25
+    self.position = self.position + self.shake_direction * self.shake_scale * 2.4
     self.shake_scale = self.shake_scale * -1
 
     if calculate_distance(self.position, player.position) <= 40 then
         sounds.player_attacked:stop()
         sounds.player_attacked:play()
         player.is_attacked = true;
-        player.red_effect_timer = 0.300
-        player.red_effect_direction = -1
-        player.red_effect_count = 0
+        player.attacked_effect_timer = 0.300
+        player.attacked_effect_direction = -1
+        player.attacked_effect_count = 0
         return true
     end
 
@@ -31,5 +31,5 @@ function enemy_bullet:update(dt)
 end
 
 function enemy_bullet:draw(sprite)
-    love.graphics.draw(sprite, self.position.x, self.position.y)
+    love.graphics.draw(sprite, self.position.x, self.position.y, 0, 1, nil, self.origin.x, self.origin.y)
 end

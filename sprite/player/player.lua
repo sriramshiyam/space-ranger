@@ -21,9 +21,9 @@ player.animation.anim1 = anim8.newAnimation(player.grid('1-2', 1), 0.1)
 player.animation.anim2 = anim8.newAnimation(player.grid('1-2', 2), 0.1)
 
 player.is_attacked = false
-player.red_effect_timer = 0.300
-player.red_effect_direction = -1
-player.red_effect_count = 0
+player.attacked_effect_timer = 0.300
+player.attacked_effect_direction = -1
+player.attacked_effect_count = 0
 
 function player:update(dt)
     self.current_anim = self.animation.anim1
@@ -70,6 +70,18 @@ function player:update(dt)
             table.remove(self.bullets, i)
         end
     end
+
+    for i = 1, #game_manager.enemies do
+        if game_manager.enemies[i].scale_timer >= 1.0 and calculate_distance(self.position, game_manager.enemies[i].position) <= 30 then
+            game_manager.enemies[i].is_removed = true
+            particles.enemy_destroyed.particle:setPosition(game_manager.enemies[i].position.x,
+                game_manager.enemies[i].position.y)
+            particles.enemy_destroyed.particle:emit(30)
+            sounds.enemy_explode:stop()
+            sounds.enemy_explode:play()
+            self.is_attacked = true
+        end
+    end
 end
 
 function player:draw()
@@ -97,27 +109,27 @@ function player:fire_bullet()
 end
 
 function player:handle_attacked_state(dt)
-    self.red_effect_timer = self.red_effect_timer + (self.red_effect_direction) * dt
+    self.attacked_effect_timer = self.attacked_effect_timer + (self.attacked_effect_direction) * dt
 
-    local red = math.abs(self.red_effect_timer / 0.300)
+    local red = math.abs(self.attacked_effect_timer / 0.300)
     shaders.player_attacked:send("red", red)
 
-    if self.red_effect_count < 2 then
-        if self.red_effect_timer >= 0.300 then
-            self.red_effect_direction = -1
-            self.red_effect_timer = 0.299
-            self.red_effect_count = self.red_effect_count + 1
-        elseif self.red_effect_timer <= -0.300 then
-            self.red_effect_direction = 1
-            self.red_effect_timer = -0.299
-            self.red_effect_count = self.red_effect_count + 1
+    if self.attacked_effect_count < 2 then
+        if self.attacked_effect_timer >= 0.300 then
+            self.attacked_effect_direction = -1
+            self.attacked_effect_timer = 0.299
+            self.attacked_effect_count = self.attacked_effect_count + 1
+        elseif self.attacked_effect_timer <= -0.300 then
+            self.attacked_effect_direction = 1
+            self.attacked_effect_timer = -0.299
+            self.attacked_effect_count = self.attacked_effect_count + 1
         end
     else
-        if self.red_effect_timer >= 0.0 then
+        if self.attacked_effect_timer >= 0.0 then
             self.is_attacked = false
-            player.red_effect_timer = 0.300
-            player.red_effect_direction = -1
-            player.red_effect_count = 0
+            player.attacked_effect_timer = 0.300
+            player.attacked_effect_direction = -1
+            player.attacked_effect_count = 0
         end
     end
 end
