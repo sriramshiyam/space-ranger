@@ -2,11 +2,11 @@ enemy = {}
 enemy.wave = 0
 enemy.fleet = 0
 
-enemy.bullets = {}
 enemy.shoot_laser_timer = 2.0
 enemy.health = 0
 enemy.is_attacked = false
 enemy.attacked_effect_timer = 0.400
+enemy.shoot_laser_count = 0
 
 enemy.linear_velocity = 0.0
 enemy.rotational_velocity = 0
@@ -36,6 +36,10 @@ function enemy:update(dt)
         return
     end
 
+    if self.wave == 3 then
+        self:wave3_update(dt)
+    end
+
     if self.delay > 0.0 then
         self.delay = self.delay - dt
         return
@@ -50,7 +54,7 @@ function enemy:update(dt)
         self.shoot_laser_timer = self.shoot_laser_timer - dt
     end
 
-    if self.shoot_laser_timer <= 0.0 then
+    if self.wave ~= 3 and self.shoot_laser_timer <= 0.0 then
         self:fire_bullet()
         sounds.enemy_laser:play()
         self.shoot_laser_timer = 2.0
@@ -75,6 +79,8 @@ function enemy:draw()
         self:wave1_draw()
     elseif self.wave == 2 then
         self:wave2_draw()
+    elseif self.wave == 3 then
+        self:wave3_draw()
     end
     if self.is_attacked then
         love.graphics.setShader()
@@ -82,6 +88,7 @@ function enemy:draw()
 end
 
 function enemy:fire_bullet()
+    self.shoot_laser_count = self.shoot_laser_count + 1
     local bullet = copy_table(enemy_bullet, true)
     bullet.direction = player.position - self.position
 
@@ -156,6 +163,24 @@ function enemy:wave2_update(dt)
     self.position = self.position + self.direction * self.linear_velocity * dt
 end
 
+function enemy:wave3_update(dt)
+    self.rotation = self.rotation + (dt * self.rotational_velocity)
+
+    self.position.x = game_manager.enemy_boss.position.x + math.cos(math.rad(self.rotation)) * game_manager.orbit_radius
+    self.position.y = game_manager.enemy_boss.position.y + math.sin(math.rad(self.rotation)) * game_manager.orbit_radius
+
+    if game_manager.enemy_boss.is_moving then
+        self.shoot_laser_count = 0
+    end
+
+    if not game_manager.enemy_boss.is_moving and
+        game_manager.enemy_boss.shoot_laser_count == 1 and
+        self.shoot_laser_count == 0 then
+        self:fire_bullet()
+        sounds.enemy_laser:play()
+    end
+end
+
 function enemy:wave1_draw()
     love.graphics.draw(self.sprite, self.position.x, self.position.y,
         math.rad((self.rotation_lap_no == 0 and 0 or -180) + -self.rotation), self.scale, nil,
@@ -168,4 +193,9 @@ function enemy:wave2_draw()
         (self.direction.x < 0 and self.fleet == 1 and -1 or 1) * self.scale, nil,
         self.origin.x,
         self.origin.y)
+end
+
+function enemy:wave3_draw()
+    love.graphics.draw(self.sprite, self.position.x, self.position.y,
+        0, 1, nil, self.origin.x, self.origin.y)
 end

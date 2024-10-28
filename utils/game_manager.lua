@@ -1,7 +1,22 @@
+anim8 = require("lib.anim8")
+require("utils.table")
+require("utils.vector")
+require("utils.sound")
+require("utils.shaders")
+require("utils.particles")
+require("sprite.sprites")
+require("sprite.player.bullet")
+require("sprite.player.player")
+require("sprite.enemy.enemy_bullet")
+require("sprite.enemy.enemy")
+require("sprite.enemy.enemy_boss")
+
 game_manager = {}
 game_manager.enemies = {}
 game_manager.enemy_bullets = {}
-
+game_manager.enemy_boss = {}
+game_manager.orbit_enemies = {}
+game_manager.orbit_radius = 0.0
 game_manager.wave1 = {}
 
 function game_manager.wave1:init()
@@ -95,22 +110,81 @@ function game_manager.wave2:update(dt)
             table.remove(game_manager.enemies, i)
         end
     end
+
+    if #game_manager.enemies == 0 then
+        game_manager.current_wave = game_manager.wave3
+        game_manager.current_wave:init()
+    end
 end
 
 function game_manager.wave2:draw()
 
 end
 
-game_manager.wave3 = {}
+game_manager.wave3 = { alpha_timer = 0.0 }
 
 function game_manager.wave3:init()
+    game_manager.enemy_boss = copy_table(enemy_boss, false)
+    game_manager.enemy_boss.linear_velocity = 175
+    game_manager.orbit_radius = enemy_boss.width + 50
+
+    local enemy_boss_diameter = game_manager.orbit_radius * 2
+
+    local axis_length = virtual_width / 2 - (enemy_boss_diameter / 2 + 50)
+
+    for i = 1, 12 do
+        local degree = 90 - (i - 1) * 30
+        game_manager.enemy_boss.positions[i] = create_vector()
+        game_manager.enemy_boss.positions[i].x = virtual_width / 2 + math.cos(math.rad(degree)) * axis_length
+        game_manager.enemy_boss.positions[i].y = virtual_height / 2 + -math.sin(math.rad(degree)) * axis_length
+    end
+
+    for i = 1, 8 do
+        game_manager.orbit_enemies[i] = copy_table(enemy, false)
+        game_manager.orbit_enemies[i].wave = 3
+        game_manager.orbit_enemies[i].delay = 3.0
+
+        game_manager.orbit_enemies[i].health = 2
+        game_manager.orbit_enemies[i].sprite = sprites.orbit_enemy
+        game_manager.orbit_enemies[i].rotation = (i - 1) * 45
+        game_manager.orbit_enemies[i].rotational_velocity = 150
+        game_manager.orbit_enemies[i].width = sprites.orbit_enemy:getWidth()
+        game_manager.orbit_enemies[i].height = sprites.orbit_enemy:getHeight()
+        game_manager.orbit_enemies[i].origin.x = game_manager.orbit_enemies[i].width / 2
+        game_manager.orbit_enemies[i].origin.y = game_manager.orbit_enemies[i].height / 2
+        game_manager.orbit_enemies[i].fleet = 1
+    end
 end
 
 function game_manager.wave3:update(dt)
+    if game_manager.current_wave.alpha_timer < 1.5 then
+        game_manager.current_wave.alpha_timer = game_manager.current_wave.alpha_timer + dt
+    end
+
+    if not game_manager.enemy_boss.is_removed then
+        game_manager.enemy_boss.delay_timer = game_manager.current_wave.alpha_timer
+        game_manager.enemy_boss:update(dt)
+    end
+
+    for i = 1, #game_manager.orbit_enemies do
+        game_manager.orbit_enemies[i]:update(dt)
+    end
+
+    for i = #game_manager.orbit_enemies, 1, -1 do
+        if game_manager.orbit_enemies[i].is_removed then
+            table.remove(game_manager.orbit_enemies, i)
+        end
+    end
 end
 
 function game_manager.wave3:draw()
-
+    local r, g, b, a = love.graphics.getColor()
+    love.graphics.setColor(r, g, b, game_manager.current_wave.alpha_timer / 1.5)
+    game_manager.enemy_boss:draw()
+    for i = 1, #game_manager.orbit_enemies do
+        game_manager.orbit_enemies[i]:draw()
+    end
+    love.graphics.setColor(r, g, b, a)
 end
 
 game_manager.current_wave = game_manager.wave1

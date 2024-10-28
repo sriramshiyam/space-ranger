@@ -6,17 +6,7 @@ local canvas
 canvasOffsetX = 0
 canvasOffsetY = 0
 
-anim8 = require("lib.anim8")
-require("utils.table")
-require("utils.vector")
-require("utils.sound")
-require("utils.shaders")
-require("utils.particles")
-require("sprite.sprites")
-require("sprite.player.bullet")
-require("sprite.player.player")
-require("sprite.enemy.enemy_bullet")
-require("sprite.enemy.enemy")
+
 require("utils.game_manager")
 
 function draw_canvas()
