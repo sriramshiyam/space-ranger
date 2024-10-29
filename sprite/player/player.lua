@@ -71,15 +71,19 @@ function player:update(dt)
         end
     end
 
-    for i = 1, #game_manager.enemies do
-        if game_manager.enemies[i].scale_timer >= 1.0 and calculate_distance(self.position, game_manager.enemies[i].position) <= 30 then
-            game_manager.enemies[i].is_removed = true
-            particles.enemy_destroyed.particle:setPosition(game_manager.enemies[i].position.x,
-                game_manager.enemies[i].position.y)
-            particles.enemy_destroyed.particle:emit(30)
-            sounds.enemy_explode:stop()
-            sounds.enemy_explode:play()
-            self.is_attacked = true
+    local enemy_lists = { game_manager.enemies, game_manager.orbit_enemies }
+
+    for j = 1, #enemy_lists do
+        local list = enemy_lists[j]
+        for i = 1, #list do
+            if list[i].scale_timer >= 1.0 and calculate_distance(self.position, list[i].position) <= 30 then
+                list[i].is_removed = true
+                particles.enemy_destroyed.particle:setPosition(list[i].position.x, list[i].position.y)
+                particles.enemy_destroyed.particle:emit(30)
+                sounds.enemy_explode:stop()
+                sounds.enemy_explode:play()
+                self.is_attacked = true
+            end
         end
     end
 end

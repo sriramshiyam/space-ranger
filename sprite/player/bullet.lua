@@ -43,6 +43,24 @@ function bullet:update(dt)
         end
     end
 
+    -- print(game_manager.enemy_boss.delay_timer)
+    if game_manager.wave_no == 3 and not game_manager.enemy_boss.is_removed and not game_manager.enemy_boss.is_moving and game_manager.enemy_boss.delay_timer >= 3.0 and calculate_distance(self.position, game_manager.enemy_boss.position) <= 40 then
+        game_manager.enemy_boss.health = game_manager.enemy_boss.health - 1
+        if game_manager.enemy_boss.health == 0 then
+            game_manager.enemy_boss.is_removed = true
+            particles.enemy_destroyed.particle:setPosition(game_manager.enemy_boss.position.x,
+                game_manager.enemy_boss.position.y)
+            particles.enemy_destroyed.particle:emit(100)
+            sounds.enemy_explode:stop()
+            sounds.enemy_explode:play()
+        else
+            game_manager.enemy_boss.is_attacked = true
+            sounds.enemy_attacked:stop()
+            sounds.enemy_attacked:play()
+        end
+        return true
+    end
+
     return (self.position.y + sprites.bullet:getHeight() < 0 or
         self.position.x + sprites.bullet:getWidth() < 0 or
         self.position.y > virtual_height or
