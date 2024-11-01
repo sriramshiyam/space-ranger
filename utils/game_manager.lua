@@ -10,6 +10,7 @@ require("sprite.player.player")
 require("sprite.enemy.enemy_bullet")
 require("sprite.enemy.enemy")
 require("sprite.enemy.enemy_boss")
+require("sprite.stars")
 
 game_manager = {}
 game_manager.enemies = {}
@@ -159,7 +160,7 @@ game_manager.wave3 = { alpha_timer = 0.0 }
 
 function game_manager.wave3:init()
     game_manager.enemy_boss = copy_table(enemy_boss, false)
-    game_manager.enemy_boss.linear_velocity = 250
+    game_manager.enemy_boss.linear_velocity = 350
     game_manager.orbit_radius = enemy_boss.width + 50
     game_manager.enemy_boss.health = 10
     game_manager.enemy_boss.total_health = 10
@@ -174,6 +175,8 @@ function game_manager.wave3:init()
         game_manager.enemy_boss.positions[i].x = virtual_width / 2 + math.cos(math.rad(degree)) * axis_length
         game_manager.enemy_boss.positions[i].y = virtual_height / 2 + -math.sin(math.rad(degree)) * axis_length
     end
+
+    shuffle_table(game_manager.enemy_boss.positions)
 
     for i = 1, 8 do
         game_manager.orbit_enemies[i] = copy_table(enemy, false)
@@ -233,11 +236,12 @@ function game_manager.wave3:draw()
     love.graphics.setColor(r, g, b, a)
 end
 
-game_manager.current_wave = game_manager.wave3
+game_manager.current_wave = game_manager.wave1
 
 function game_manager:load()
     game_manager.current_wave:init()
     particles.enemy_destroyed:load()
+    stars:load()
 end
 
 function game_manager:update(dt)
@@ -250,6 +254,8 @@ function game_manager:update(dt)
             table.remove(self.enemies, i)
         end
     end
+
+    stars:update(dt)
 
     player:update(dt)
     self.current_wave:update(dt)
@@ -264,6 +270,7 @@ function game_manager:update(dt)
 end
 
 function game_manager:draw()
+    stars:draw()
     player:draw()
     for i = 1, #self.enemies do
         self.enemies[i]:draw()

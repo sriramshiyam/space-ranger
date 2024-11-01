@@ -104,6 +104,7 @@ function enemy_boss:move(dt)
         self.current_position = self.current_position + 1
         if self.current_position > #self.positions then
             self.current_position = 1
+            shuffle_table(self.positions)
         end
     end
 end

@@ -55,6 +55,23 @@ function player:update(dt)
 
     self.position = self.position + (self.direction * self.linear_velocity * dt)
 
+    if self.position.x < 0.0 then
+        self.position.x = 0
+    end
+
+    if self.position.x > virtual_width then
+        self.position.x = virtual_width
+    end
+
+
+    if self.position.y < 0.0 then
+        self.position.y = 0
+    end
+
+    if self.position.y > virtual_height then
+        self.position.y = virtual_height
+    end
+
     self.current_anim:update(dt)
 
     self.direction.x = 0
