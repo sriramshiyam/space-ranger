@@ -245,6 +245,13 @@ function game_manager:load()
 end
 
 function game_manager:update(dt)
+    stars:update(dt)
+    player:update(dt)
+
+    if stars.scale ~= 2.0 then
+        return
+    end
+
     for i = 1, #self.enemies do
         self.enemies[i]:update(dt)
     end
@@ -255,9 +262,6 @@ function game_manager:update(dt)
         end
     end
 
-    stars:update(dt)
-
-    player:update(dt)
     self.current_wave:update(dt)
     particles.enemy_destroyed:update(dt)
 
@@ -272,6 +276,7 @@ end
 function game_manager:draw()
     stars:draw()
     player:draw()
+
     for i = 1, #self.enemies do
         self.enemies[i]:draw()
     end
