@@ -12,7 +12,6 @@ star.direction = create_vector()
 star.position = create_vector()
 star.linear_velocity = 0.0
 star.alpha = 1
-star.is_calculating = false
 
 function stars:load()
     for i = 1, 20 do
@@ -69,7 +68,8 @@ function stars:update(dt)
     end
 
     for i = #self.list, 1, -1 do
-        self.list[i].position = self.list[i].position + (self.list[i].direction * self.list[i].linear_velocity * dt * self.scale)
+        self.list[i].position = self.list[i].position +
+        (self.list[i].direction * self.list[i].linear_velocity * dt * self.scale)
         if self.list[i].position.y > virtual_height then
             table.remove(self.list, i)
         end

@@ -41,3 +41,7 @@ function love.draw()
     love.graphics.setCanvas()
     draw_canvas()
 end
+
+function love.keypressed(key)
+    game_manager:keypressed(key)
+end

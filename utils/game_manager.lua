@@ -4,6 +4,7 @@ require("utils.vector")
 require("utils.sound")
 require("utils.shaders")
 require("utils.particles")
+require("utils.menu")
 require("sprite.sprites")
 require("sprite.player.bullet")
 require("sprite.player.player")
@@ -20,6 +21,7 @@ game_manager.orbit_enemies = {}
 game_manager.orbit_radius = 0.0
 game_manager.wave1 = {}
 game_manager.wave_no = 0
+game_manager.state = "menu"
 
 function draw_health_bar(x, y, width, height, border_width, health, total_health, ratio)
     local rectangles = {
@@ -137,6 +139,7 @@ function game_manager.wave2:init()
         normalize_vector(game_manager.enemies[i].direction)
     end
     game_manager.wave_no = 2
+    stars.scale = 40
 end
 
 function game_manager.wave2:update(dt)
@@ -195,6 +198,7 @@ function game_manager.wave3:init()
         game_manager.orbit_enemies[i].fleet = 1
     end
     game_manager.wave_no = 3
+    stars.scale = 40
 end
 
 function game_manager.wave3:update(dt)
@@ -239,6 +243,8 @@ end
 game_manager.current_wave = game_manager.wave1
 
 function game_manager:load()
+    love.mouse.setVisible(false)
+    menu:init()
     game_manager.current_wave:init()
     particles.enemy_destroyed:load()
     stars:load()
@@ -246,43 +252,57 @@ end
 
 function game_manager:update(dt)
     stars:update(dt)
-    player:update(dt)
+    if self.state == "menu" then
+        menu:update(dt)
+    elseif self.state == "game" then
+        player:update(dt)
 
-    if stars.scale ~= 2.0 then
-        return
-    end
-
-    for i = 1, #self.enemies do
-        self.enemies[i]:update(dt)
-    end
-
-    for i = #self.enemies, 1, -1 do
-        if self.enemies[i].is_removed then
-            table.remove(self.enemies, i)
+        for i = #self.enemy_bullets, 1, -1 do
+            local is_removed = self.enemy_bullets[i]:update(dt)
+            if is_removed then
+                table.remove(self.enemy_bullets, i)
+            end
         end
-    end
+        particles.enemy_destroyed:update(dt)
 
-    self.current_wave:update(dt)
-    particles.enemy_destroyed:update(dt)
-
-    for i = #self.enemy_bullets, 1, -1 do
-        local is_removed = self.enemy_bullets[i]:update(dt)
-        if is_removed then
-            table.remove(self.enemy_bullets, i)
+        if stars.scale ~= 2.0 then
+            return
         end
+
+        for i = 1, #self.enemies do
+            self.enemies[i]:update(dt)
+        end
+
+        for i = #self.enemies, 1, -1 do
+            if self.enemies[i].is_removed then
+                table.remove(self.enemies, i)
+            end
+        end
+
+        self.current_wave:update(dt)
     end
 end
 
 function game_manager:draw()
     stars:draw()
-    player:draw()
+    if self.state == "menu" then
+        menu:draw()
+    elseif self.state == "game" then
+        player:draw()
 
-    for i = 1, #self.enemies do
-        self.enemies[i]:draw()
+        for i = 1, #self.enemies do
+            self.enemies[i]:draw()
+        end
+        for i = 1, #self.enemy_bullets do
+            self.enemy_bullets[i]:draw(sprites.enemy_bullet)
+        end
+        self.current_wave:draw()
+        particles.enemy_destroyed:draw()
     end
-    for i = 1, #self.enemy_bullets do
-        self.enemy_bullets[i]:draw(sprites.enemy_bullet)
+end
+
+function game_manager:keypressed(key)
+    if self.state == "menu" then
+        menu:keypressed(key)
     end
-    self.current_wave:draw()
-    particles.enemy_destroyed:draw()
 end
