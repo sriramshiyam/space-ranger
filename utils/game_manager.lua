@@ -6,6 +6,7 @@ require("utils.shaders")
 require("utils.particles")
 require("utils.menu")
 require("sprite.sprites")
+require("sprite.blast")
 require("sprite.player.bullet")
 require("sprite.player.player")
 require("sprite.enemy.enemy_bullet")
@@ -22,6 +23,7 @@ game_manager.orbit_radius = 0.0
 game_manager.wave1 = {}
 game_manager.wave_no = 0
 game_manager.state = "menu"
+game_manager.blasts = {}
 
 function draw_health_bar(x, y, width, height, border_width, health, total_health, ratio)
     local rectangles = {
@@ -240,7 +242,7 @@ function game_manager.wave3:draw()
     love.graphics.setColor(r, g, b, a)
 end
 
-game_manager.current_wave = game_manager.wave1
+game_manager.current_wave = game_manager.wave3
 
 function game_manager:load()
     love.mouse.setVisible(false)
@@ -263,7 +265,15 @@ function game_manager:update(dt)
                 table.remove(self.enemy_bullets, i)
             end
         end
+
         particles.enemy_destroyed:update(dt)
+
+        for i = #self.blasts, 1, -1 do
+            self.blasts[i]:update(dt)
+            if self.blasts[i].is_removed then
+                table.remove(self.blasts, i)
+            end
+        end
 
         if stars.scale ~= 2.0 then
             return
@@ -278,6 +288,7 @@ function game_manager:update(dt)
                 table.remove(self.enemies, i)
             end
         end
+
 
         self.current_wave:update(dt)
     end
@@ -297,6 +308,9 @@ function game_manager:draw()
             self.enemy_bullets[i]:draw(sprites.enemy_bullet)
         end
         self.current_wave:draw()
+        for i = 1, #self.blasts do
+            self.blasts[i]:draw()
+        end
         particles.enemy_destroyed:draw()
     end
 end

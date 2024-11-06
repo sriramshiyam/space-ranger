@@ -14,7 +14,9 @@ function menu:init()
         y = virtual_height / 2,
         action = function()
             stars.scale = 40
+            sounds.menu_music:stop()
             game_manager.state = "game"
+            sounds.game_music:play()
         end
     }
     self.positions[2] = {

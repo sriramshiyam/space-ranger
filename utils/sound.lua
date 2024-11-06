@@ -8,6 +8,7 @@ sounds.enemy_attacked = love.audio.newSource("resource/audio/enemy_attacked.wav"
 sounds.enemy_boss_laser = love.audio.newSource("resource/audio/enemy_boss_bullet.wav", "static")
 sounds.menu_active = love.audio.newSource("resource/audio/menu_active.wav", "static")
 sounds.menu_select = love.audio.newSource("resource/audio/menu_select.wav", "static")
+sounds.menu_music = love.audio.newSource("resource/audio/menu.xm", "stream")
 
 
 
@@ -20,4 +21,5 @@ sounds.enemy_boss_laser:setVolume(0.5)
 sounds.menu_active:setVolume(0.6)
 sounds.menu_select:setVolume(0.8)
 sounds.game_music:setLooping(true)
-sounds.game_music:play()
+sounds.menu_music:setLooping(true)
+sounds.menu_music:play()

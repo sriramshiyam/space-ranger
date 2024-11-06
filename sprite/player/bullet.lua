@@ -30,6 +30,11 @@ function bullet:update(dt)
                     list[i].is_removed = true
                     particles.enemy_destroyed.particle:setPosition(list[i].position.x,
                         list[i].position.y)
+                    local blast = copy_table(blast, false)
+                    blast:init()
+                    blast.position.x = list[i].position.x
+                    blast.position.y = list[i].position.y
+                    table.insert(game_manager.blasts, blast)
                     particles.enemy_destroyed.particle:emit(30)
                     sounds.enemy_explode:stop()
                     sounds.enemy_explode:play()
@@ -50,6 +55,12 @@ function bullet:update(dt)
             game_manager.enemy_boss.is_removed = true
             particles.enemy_destroyed.particle:setPosition(game_manager.enemy_boss.position.x,
                 game_manager.enemy_boss.position.y)
+            local blast = copy_table(blast, false)
+            blast:init()
+            blast.position.x = game_manager.enemy_boss.position.x
+            blast.position.y = game_manager.enemy_boss.position.y
+            blast.scale = 1.5
+            table.insert(game_manager.blasts, blast)
             particles.enemy_destroyed.particle:emit(100)
             sounds.enemy_explode:stop()
             sounds.enemy_explode:play()
