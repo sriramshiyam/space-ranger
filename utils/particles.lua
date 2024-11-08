@@ -9,8 +9,7 @@ function particles.enemy_destroyed:load()
     self.particle:setSpeed(300, 400)
     self.particle:setSpread(2 * math.pi)
     self.particle:setSizes(1.0, 0.9, 0.7, 0.4, 0.2, 0.5)
-    self.particle:setLinearDamping(1, 1.25)
-    self.particle:setParticleLifetime(1, 1.5)
+    self.particle:setParticleLifetime(1, 2)
 end
 
 function particles.enemy_destroyed:update(dt)

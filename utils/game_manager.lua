@@ -6,6 +6,7 @@ require("utils.shaders")
 require("utils.particles")
 require("utils.menu")
 require("sprite.sprites")
+require("utils.text_dialog")
 require("sprite.blast")
 require("sprite.player.bullet")
 require("sprite.player.player")
@@ -100,6 +101,7 @@ end
 game_manager.wave2 = {}
 
 function game_manager.wave2:init()
+    text_dialog:init_dialog({ "TOO\tLATE!", "THEY\tARE\tCOMING", "WITH\tA\tFULL\tFLEET", "GOOD\tLUCK!" })
     local y_offset = (virtual_height - 100) / 5
     local destination = create_vector()
     destination.y = y_offset
@@ -242,11 +244,12 @@ function game_manager.wave3:draw()
     love.graphics.setColor(r, g, b, a)
 end
 
-game_manager.current_wave = game_manager.wave3
+game_manager.current_wave = game_manager.wave1
 
 function game_manager:load()
     love.mouse.setVisible(false)
     menu:init()
+    text_dialog:init()
     game_manager.current_wave:init()
     particles.enemy_destroyed:load()
     stars:load()
@@ -279,6 +282,11 @@ function game_manager:update(dt)
             return
         end
 
+        if text_dialog.active then
+            text_dialog:update(dt)
+            return
+        end
+
         for i = 1, #self.enemies do
             self.enemies[i]:update(dt)
         end
@@ -288,7 +296,6 @@ function game_manager:update(dt)
                 table.remove(self.enemies, i)
             end
         end
-
 
         self.current_wave:update(dt)
     end
@@ -312,6 +319,7 @@ function game_manager:draw()
             self.blasts[i]:draw()
         end
         particles.enemy_destroyed:draw()
+        text_dialog:draw()
     end
 end
 
