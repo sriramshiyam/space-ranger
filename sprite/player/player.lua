@@ -109,7 +109,8 @@ function player:draw()
     if self.is_attacked then
         love.graphics.setShader(shaders.player_attacked)
     end
-    self.current_anim:draw(sprites.player, self.position.x, self.position.y, 0, 1, nil, self.origin.x, self.origin.y)
+    self.current_anim:draw(sprites.player, self.position.x, self.position.y, 0, self.scale, 1, self.origin.x,
+        self.origin.y)
     if self.is_attacked then
         love.graphics.setShader()
     end
